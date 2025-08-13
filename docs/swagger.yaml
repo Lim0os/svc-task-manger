@@ -1,0 +1,390 @@
+basePath: /
+definitions:
+  domain.Task:
+    properties:
+      createdAt:
+        description: |-
+          Время создания задачи
+          example: "2024-01-15T09:00:00Z"
+        type: string
+      dependsOn:
+        description: |-
+          Список зависимостей
+          example: ["task-456", "task-789"]
+        items:
+          type: string
+        type: array
+      finishedAt:
+        description: |-
+          Время завершения выполнения
+          example: "2024-01-15T10:05:00Z"
+        type: string
+      id:
+        description: |-
+          Уникальный идентификатор задачи
+          example: "task-123"
+        type: string
+      lastError:
+        allOf:
+        - $ref: '#/definitions/domain.TaskError'
+        description: Информация о последней ошибке
+      maxRetries:
+        description: |-
+          Максимальное количество попыток
+          example: 3
+        type: integer
+      metadata:
+        additionalProperties: true
+        description: |-
+          Метаданные задачи
+          example: {"source": "api", "user_id": "123"}
+        type: object
+      output:
+        description: Результат выполнения задачи
+      parentTaskId:
+        description: |-
+          ID родительской задачи
+          example: "task-123"
+        type: string
+      payload:
+        additionalProperties: true
+        description: |-
+          Полезная нагрузка задачи
+          example: {"email": "user@example.com", "subject": "Test"}
+        type: object
+      priority:
+        allOf:
+        - $ref: '#/definitions/domain.TaskPriority'
+        description: |-
+          Приоритет задачи
+          enum: low,medium,high,critical
+          example: "high"
+      queue:
+        description: |-
+          Очередь для выполнения
+          example: "default"
+        type: string
+      retryCount:
+        description: |-
+          Количество попыток выполнения
+          example: 0
+        type: integer
+      scheduledAt:
+        description: |-
+          Время планируемого выполнения
+          example: "2024-01-15T10:00:00Z"
+        type: string
+      startedAt:
+        description: |-
+          Время начала выполнения
+          example: "2024-01-15T10:00:00Z"
+        type: string
+      status:
+        allOf:
+        - $ref: '#/definitions/domain.TaskStatus'
+        description: |-
+          Текущий статус задачи
+          enum: pending,processing,completed,failed,retrying
+          example: "pending"
+      type:
+        description: |-
+          Тип задачи
+          example: "email_send"
+        type: string
+      updatedAt:
+        description: |-
+          Время последнего обновления
+          example: "2024-01-15T09:00:00Z"
+        type: string
+      workerId:
+        description: |-
+          ID воркера, выполняющего задачу
+          example: "worker-1"
+        type: string
+    type: object
+  domain.TaskError:
+    properties:
+      code:
+        description: |-
+          Код ошибки
+          example: "EMAIL_SEND_FAILED"
+        type: string
+      message:
+        description: |-
+          Сообщение об ошибке
+          example: "Failed to send email"
+        type: string
+      stack:
+        description: |-
+          Стек вызовов (если доступен)
+          example: "main.main()\n\tmain.go:25 +0x123"
+        type: string
+    type: object
+  domain.TaskPriority:
+    enum:
+    - low
+    - medium
+    - high
+    - critical
+    type: string
+    x-enum-varnames:
+    - TaskPriorityLow
+    - TaskPriorityMedium
+    - TaskPriorityHigh
+    - TaskPriorityCritical
+  domain.TaskStatus:
+    enum:
+    - pending
+    - processing
+    - completed
+    - failed
+    - retrying
+    type: string
+    x-enum-varnames:
+    - TaskStatusPending
+    - TaskStatusProcessing
+    - TaskStatusCompleted
+    - TaskStatusFailed
+    - TaskStatusRetrying
+  dto.Response:
+    properties:
+      data:
+        description: Данные ответа (меняется в зависимости от endpoint)
+      error:
+        description: |-
+          Сообщение об ошибке (если есть)
+          example: "invalid request"
+        type: string
+      status:
+        description: |-
+          HTTP-статус код
+          example: 200
+        type: integer
+    type: object
+  dto.TaskRequest:
+    properties:
+      dependsOn:
+        description: |-
+          Список зависимостей
+          example: ["task-456", "task-789"]
+        items:
+          type: string
+        type: array
+      maxRetries:
+        description: |-
+          Максимальное количество попыток
+          minimum: 0
+          example: 3
+        type: integer
+      metadata:
+        additionalProperties: true
+        description: |-
+          Метаданные задачи
+          example: {"source": "api", "user_id": "123"}
+        type: object
+      parentTaskId:
+        description: |-
+          ID родительской задачи
+          example: "task-123"
+        type: string
+      payload:
+        additionalProperties: true
+        description: |-
+          Полезная нагрузка задачи
+          required: true
+          example: {"email": "user@example.com", "subject": "Test"}
+        type: object
+      priority:
+        description: |-
+          Приоритет задачи
+          required: true
+          enum: low,medium,high,critical
+          example: "high"
+        type: string
+      queue:
+        description: |-
+          Очередь для выполнения
+          required: true
+          example: "default"
+        type: string
+      retryCount:
+        description: |-
+          Количество попыток выполнения
+          minimum: 0
+          example: 0
+        type: integer
+      scheduledAt:
+        description: |-
+          Время планируемого выполнения
+          example: "2024-01-15T10:00:00Z"
+        type: string
+      type:
+        description: |-
+          Тип задачи (обязательное поле)
+          required: true
+          example: "email_send"
+        type: string
+    type: object
+  dto.UpdateTaskStatusRequest:
+    properties:
+      id:
+        type: string
+      status:
+        description: |-
+          Новый статус задачи
+          required: true
+          enum: pending,processing,completed,failed,retrying
+          example: "completed"
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API для управления задачами
+  title: task_master API
+  version: "1.0"
+paths:
+  /task:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает список задач с возможностью фильтрации по статусу
+      parameters:
+      - description: Статус для фильтрации (pending, processing, completed, failed,
+          retrying)
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список задач получен
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Task'
+                  type: array
+              type: object
+        "400":
+          description: Некорректные параметры запроса
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Получение списка задач
+      tags:
+      - tasks
+    post:
+      consumes:
+      - application/json
+      description: Создает новую задачу в системе
+      parameters:
+      - description: Данные для создания задачи
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TaskRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Задача успешно создана
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Task'
+              type: object
+        "400":
+          description: Некорректные данные запроса
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Создание новой задачи
+      tags:
+      - tasks
+  /task/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает задачу по указанному идентификатору
+      parameters:
+      - description: ID задачи
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Задача найдена
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Task'
+              type: object
+        "400":
+          description: Некорректный ID задачи
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Получение задачи по ID
+      tags:
+      - tasks
+    put:
+      consumes:
+      - application/json
+      description: Обновляет статус задачи по указанному идентификатору
+      parameters:
+      - description: ID задачи
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Данные для обновления статуса
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateTaskStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Статус задачи обновлен
+          schema:
+            allOf:
+            - $ref: '#/definitions/dto.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.Task'
+              type: object
+        "400":
+          description: Некорректные данные запроса
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: Обновление статуса задачи
+      tags:
+      - tasks
+swagger: "2.0"

@@ -1,0 +1,472 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API для управления задачами",
+        "title": "task_master API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/task": {
+            "get": {
+                "description": "Возвращает список задач с возможностью фильтрации по статусу",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tasks"
+                ],
+                "summary": "Получение списка задач",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Статус для фильтрации (pending, processing, completed, failed, retrying)",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Список задач получен",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/domain.Task"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Некорректные параметры запроса",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Создает новую задачу в системе",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tasks"
+                ],
+                "summary": "Создание новой задачи",
+                "parameters": [
+                    {
+                        "description": "Данные для создания задачи",
+                        "name": "task",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.TaskRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Задача успешно создана",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.Task"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Некорректные данные запроса",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/task/{id}": {
+            "get": {
+                "description": "Возвращает задачу по указанному идентификатору",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tasks"
+                ],
+                "summary": "Получение задачи по ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID задачи",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Задача найдена",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.Task"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Некорректный ID задачи",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Обновляет статус задачи по указанному идентификатору",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tasks"
+                ],
+                "summary": "Обновление статуса задачи",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID задачи",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Данные для обновления статуса",
+                        "name": "task",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateTaskStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Статус задачи обновлен",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dto.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/domain.Task"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Некорректные данные запроса",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "domain.Task": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "description": "Время создания задачи\nexample: \"2024-01-15T09:00:00Z\"",
+                    "type": "string"
+                },
+                "dependsOn": {
+                    "description": "Список зависимостей\nexample: [\"task-456\", \"task-789\"]",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "finishedAt": {
+                    "description": "Время завершения выполнения\nexample: \"2024-01-15T10:05:00Z\"",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "Уникальный идентификатор задачи\nexample: \"task-123\"",
+                    "type": "string"
+                },
+                "lastError": {
+                    "description": "Информация о последней ошибке",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/domain.TaskError"
+                        }
+                    ]
+                },
+                "maxRetries": {
+                    "description": "Максимальное количество попыток\nexample: 3",
+                    "type": "integer"
+                },
+                "metadata": {
+                    "description": "Метаданные задачи\nexample: {\"source\": \"api\", \"user_id\": \"123\"}",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "output": {
+                    "description": "Результат выполнения задачи"
+                },
+                "parentTaskId": {
+                    "description": "ID родительской задачи\nexample: \"task-123\"",
+                    "type": "string"
+                },
+                "payload": {
+                    "description": "Полезная нагрузка задачи\nexample: {\"email\": \"user@example.com\", \"subject\": \"Test\"}",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "priority": {
+                    "description": "Приоритет задачи\nenum: low,medium,high,critical\nexample: \"high\"",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/domain.TaskPriority"
+                        }
+                    ]
+                },
+                "queue": {
+                    "description": "Очередь для выполнения\nexample: \"default\"",
+                    "type": "string"
+                },
+                "retryCount": {
+                    "description": "Количество попыток выполнения\nexample: 0",
+                    "type": "integer"
+                },
+                "scheduledAt": {
+                    "description": "Время планируемого выполнения\nexample: \"2024-01-15T10:00:00Z\"",
+                    "type": "string"
+                },
+                "startedAt": {
+                    "description": "Время начала выполнения\nexample: \"2024-01-15T10:00:00Z\"",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "Текущий статус задачи\nenum: pending,processing,completed,failed,retrying\nexample: \"pending\"",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/domain.TaskStatus"
+                        }
+                    ]
+                },
+                "type": {
+                    "description": "Тип задачи\nexample: \"email_send\"",
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "description": "Время последнего обновления\nexample: \"2024-01-15T09:00:00Z\"",
+                    "type": "string"
+                },
+                "workerId": {
+                    "description": "ID воркера, выполняющего задачу\nexample: \"worker-1\"",
+                    "type": "string"
+                }
+            }
+        },
+        "domain.TaskError": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "Код ошибки\nexample: \"EMAIL_SEND_FAILED\"",
+                    "type": "string"
+                },
+                "message": {
+                    "description": "Сообщение об ошибке\nexample: \"Failed to send email\"",
+                    "type": "string"
+                },
+                "stack": {
+                    "description": "Стек вызовов (если доступен)\nexample: \"main.main()\\n\\tmain.go:25 +0x123\"",
+                    "type": "string"
+                }
+            }
+        },
+        "domain.TaskPriority": {
+            "type": "string",
+            "enum": [
+                "low",
+                "medium",
+                "high",
+                "critical"
+            ],
+            "x-enum-varnames": [
+                "TaskPriorityLow",
+                "TaskPriorityMedium",
+                "TaskPriorityHigh",
+                "TaskPriorityCritical"
+            ]
+        },
+        "domain.TaskStatus": {
+            "type": "string",
+            "enum": [
+                "pending",
+                "processing",
+                "completed",
+                "failed",
+                "retrying"
+            ],
+            "x-enum-varnames": [
+                "TaskStatusPending",
+                "TaskStatusProcessing",
+                "TaskStatusCompleted",
+                "TaskStatusFailed",
+                "TaskStatusRetrying"
+            ]
+        },
+        "dto.Response": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Данные ответа (меняется в зависимости от endpoint)"
+                },
+                "error": {
+                    "description": "Сообщение об ошибке (если есть)\nexample: \"invalid request\"",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "HTTP-статус код\nexample: 200",
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.TaskRequest": {
+            "type": "object",
+            "properties": {
+                "dependsOn": {
+                    "description": "Список зависимостей\nexample: [\"task-456\", \"task-789\"]",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "maxRetries": {
+                    "description": "Максимальное количество попыток\nminimum: 0\nexample: 3",
+                    "type": "integer"
+                },
+                "metadata": {
+                    "description": "Метаданные задачи\nexample: {\"source\": \"api\", \"user_id\": \"123\"}",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "parentTaskId": {
+                    "description": "ID родительской задачи\nexample: \"task-123\"",
+                    "type": "string"
+                },
+                "payload": {
+                    "description": "Полезная нагрузка задачи\nrequired: true\nexample: {\"email\": \"user@example.com\", \"subject\": \"Test\"}",
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "priority": {
+                    "description": "Приоритет задачи\nrequired: true\nenum: low,medium,high,critical\nexample: \"high\"",
+                    "type": "string"
+                },
+                "queue": {
+                    "description": "Очередь для выполнения\nrequired: true\nexample: \"default\"",
+                    "type": "string"
+                },
+                "retryCount": {
+                    "description": "Количество попыток выполнения\nminimum: 0\nexample: 0",
+                    "type": "integer"
+                },
+                "scheduledAt": {
+                    "description": "Время планируемого выполнения\nexample: \"2024-01-15T10:00:00Z\"",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Тип задачи (обязательное поле)\nrequired: true\nexample: \"email_send\"",
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UpdateTaskStatusRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "status": {
+                    "description": "Новый статус задачи\nrequired: true\nenum: pending,processing,completed,failed,retrying\nexample: \"completed\"",
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
