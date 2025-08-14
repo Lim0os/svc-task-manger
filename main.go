@@ -33,7 +33,7 @@ func main() {
 	asyncLogeer.Info("Loaded configuration", slog.Any("config", cfg))
 
 	asyncLogeer.Info("Initializing repository...")
-	repo := db.NewRepository(asyncLogeer, cfg.MemoryDB.NumShards)
+	repo := db.NewRepository(asyncLogeer, cfg.MemoryDB.NumShards, cfg.MemoryDB.TTL)
 
 	asyncLogeer.Info("Initializing application service...")
 	app := application.InitApp(repo.InMemoryDB, asyncLogeer)

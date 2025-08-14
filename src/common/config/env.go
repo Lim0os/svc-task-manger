@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"strconv"
+	"time"
 )
 
 type Config struct {
@@ -17,7 +18,7 @@ type Logger struct {
 }
 
 type MemoryDB struct {
-	TTL       int
+	TTL       time.Duration
 	NumShards int
 }
 
@@ -35,7 +36,7 @@ func LoadConfig() *Config {
 			BathSize: parseEnvInt("BATCH_SIZE", 100),
 		},
 		MemoryDB: MemoryDB{
-			TTL:       parseEnvInt("MEMORY_TTL", 300),
+			TTL:       time.Duration(parseEnvInt("MEMORY_TTL", 30)) * time.Second,
 			NumShards: parseEnvInt("NUM_SHARDS", 100),
 		},
 	}
